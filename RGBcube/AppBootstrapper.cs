@@ -66,5 +66,32 @@ namespace RGBcube
         //    builder.RegisterType<MainWindowViewModel>().AsSelf();
         //    return builder.Build();
         //}
+
+
+        //private IContainer _container;
+
+        //protected override void OnStartup(StartupEventArgs args)
+        //{
+        //    base.OnStartup(args);
+
+        //    var builder = new ContainerBuilder();
+        //    builder.RegisterType<Logger>().As<ILogger>().SingleInstance();
+        //    builder.RegisterType<WindowOpener>().As<IWindowOpener>().SingleInstance();
+        //    builder.RegisterViewsAndViewModelsInAssembly();
+        //    _container = builder.Build();
+
+        //    MainWindow = _container.Resolve<MainWindowView>();
+        //    MainWindow.Show();
+        //}
+
+        //protected override void OnExit(ExitEventArgs args)
+        //{
+        //    if (_container != null)
+        //    {
+        //        _container.Dispose();
+        //    }
+
+        //    base.OnExit(args);
+        //}
     }
 }
