@@ -4,6 +4,7 @@ using RGBcube.Service;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Windows.Media;
 
 namespace RGBcube.ViewModels
@@ -11,8 +12,9 @@ namespace RGBcube.ViewModels
     public class MainWindowViewModel : PropertyChangedBase
     {
         private string fileNameTextBox;
-        private WorkingFile workingFile;        
+        private WorkingFile workingFile;
         private string fileName;
+        private ColorGrid selectedItem;
 
         private ObservableCollection<ColorGrid> colors = new ObservableCollection<ColorGrid>();
         public ObservableCollection<ColorGrid> Colors
@@ -22,8 +24,20 @@ namespace RGBcube.ViewModels
             {
                 if (colors == value)
                     return;
-                colors = value;                
+                colors = value;
                 NotifyOfPropertyChange(() => Colors);
+            }
+        }
+
+        public ColorGrid SelectedItem
+        {
+            get { return selectedItem; }
+            set
+            {
+                if (selectedItem == value)
+                    return;
+                selectedItem = value;
+                NotifyOfPropertyChange(() => SelectedItem);
             }
         }
 
@@ -41,22 +55,6 @@ namespace RGBcube.ViewModels
 
         public bool IsWorkingFile => workingFile != null ? true : false;
 
-
-        //private Color? color;
-        //public Color? Color
-        //{
-        //    get { return color; }
-        //    set
-        //    {
-        //        if (color == value)
-        //            return;
-        //        color = value;
-        //        FileNameTextBox = color.Value.ToString();
-        //        NotifyOfPropertyChange(() => Color);
-        //        NotifyOfPropertyChange(() => FileNameTextBox);
-        //    }
-        //}
-
         public string FileName
         {
             get { return fileName; }
@@ -69,24 +67,8 @@ namespace RGBcube.ViewModels
             }
         }
 
-        //public void Open()
-        //{
-        //    workingFile = FileManager.Open();
-        //    if (workingFile != null)
-        //    {
-        //        var color = ParsStringToColor(workingFile.Content);
-
-        //        Color = color;
-        //        FileName = workingFile.FileName;
-        //    }            
-        //}
-
-        public void New()
+        public void Create()
         {
-            workingFile = new WorkingFile();
-            //FileNameTextBox = string.Empty;
-            FileName = string.Empty;
-
             var temp = new Color
             {
                 R = 50,
@@ -100,22 +82,50 @@ namespace RGBcube.ViewModels
                 Color = temp
             };
             Colors.Add(colorGrid);
+        }
 
-            var temp2 = new Color
+        public void Copy()
+        {
+            if (SelectedItem != null)
             {
-                R = 50,
-                G = 50,
-                B = 50,
-                A = 255
-            };
+                int copy = Colors.IndexOf(SelectedItem);
 
-            var colorGrid2 = new ColorGrid
+                var colorGrid = new ColorGrid
+                {
+                    Color = SelectedItem.Color.Value
+                };
+                Colors.Insert(copy, colorGrid);
+            }
+           
+        }
+
+        public void Remove()
+        {
+            if (SelectedItem != null)
             {
-                Color = temp
-            };
-            Colors.Add(colorGrid2);
+                Colors.Remove(SelectedItem);
+            }
+        }
+
+        public void New()
+        {
+            workingFile = new WorkingFile();
+            FileName = "New file";
+
             NotifyOfPropertyChange(() => IsWorkingFile);
         }
+
+        //public void Open()
+        //{
+        //    workingFile = FileManager.Open();
+        //    if (workingFile != null)
+        //    {
+        //        var color = ParsStringToColor(workingFile.Content);
+
+        //        Color = color;
+        //        FileName = workingFile.FileName;
+        //    }            
+        //}
 
         //public void Save()
         //{
@@ -141,7 +151,7 @@ namespace RGBcube.ViewModels
         //    FileName = workingFile.FileName;
         //}
 
-        private string ParsColorToString (Color? color)
+        private string ParsColorToString(Color? color)
         {
             string tempString;
 

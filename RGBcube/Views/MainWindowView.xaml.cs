@@ -24,5 +24,7 @@ namespace RGBcube.Views
             ButtonCloseMenu.Visibility = Visibility.Collapsed;
             ButtonOpenMenu.Visibility = Visibility.Visible;
         }
+
+
     }
 }
