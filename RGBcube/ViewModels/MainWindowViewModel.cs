@@ -39,6 +39,9 @@ namespace RGBcube.ViewModels
             }
         }
 
+        public bool IsWorkingFile => workingFile != null ? true : false;
+
+
         //private Color? color;
         //public Color? Color
         //{
@@ -111,6 +114,7 @@ namespace RGBcube.ViewModels
                 Color = temp
             };
             Colors.Add(colorGrid2);
+            NotifyOfPropertyChange(() => IsWorkingFile);
         }
 
         //public void Save()

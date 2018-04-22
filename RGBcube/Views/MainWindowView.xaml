@@ -7,75 +7,119 @@
              xmlns:local="clr-namespace:RGBcube.Views"
              xmlns:wpfTool="clr-namespace:Xceed.Wpf.Toolkit;assembly=Xceed.Wpf.Toolkit"
              xmlns:dd="clr-namespace:GongSolutions.Wpf.DragDrop;assembly=GongSolutions.Wpf.DragDrop"
-             Height="350" Width="525" Background="LightBlue">
-    <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="auto"></RowDefinition>
-            <RowDefinition Height="auto"></RowDefinition>
-            <RowDefinition Height="auto"></RowDefinition>
-            <RowDefinition Height="auto"></RowDefinition>
-        </Grid.RowDefinitions>
-        <Menu>
-            <MenuItem Header="File">
-                <MenuItem Header="New"
-                          cal:Message.Attach="New()">
-                </MenuItem>
-                <MenuItem Header="Open"
-                          cal:Message.Attach="Open()">
-                </MenuItem>
-                <MenuItem Header="Save" 
-                          cal:Message.Attach="Save()">
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        mc:Ignorable="d" Height="600" Width="1080" Foreground="White" >
 
-                </MenuItem>
-                <MenuItem Header="SaveAs..."
-                          cal:Message.Attach="SaveAs()">
-
-                </MenuItem>
-                <Separator></Separator>
-                <MenuItem Header="Exit"></MenuItem>
-            </MenuItem>
-            <MenuItem Header="Edit">
-            </MenuItem>
-
-        </Menu>
-
-        <Label Grid.Row="1" Height="auto" HorizontalAlignment="Left" 
-                 Content="{Binding FileName}" VerticalAlignment="Top" Width="auto" />
-
-        <StackPanel Grid.Row="2" Margin="5" Orientation="Horizontal">
-            <TextBlock FontSize="16" Margin="5" Text="fxfgxxgfg" 
-                                   HorizontalAlignment="Center" />
-            <wpfTool:ColorPicker Grid.Row="3" Name="ColorPicker" 
-                                Margin="5"  Height="30" DisplayColorAndName="True" 
-                              UsingAlphaChannel="False" 
-                             SelectedColor="Aqua"/>
-        </StackPanel>
-        <!--<TextBox Grid.Row="2" Height="auto" TextAlignment="Left" HorizontalAlignment="Left" Margin="6,10,0,0"
-                 Text="{Binding FileNameTextBox, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" VerticalAlignment="Top" Width="393" />-->
-
-        <!--<wpfTool:ColorPicker Grid.Row="3" Name="ColorPicker" Height="30" DisplayColorAndName="True" 
-                             Margin="26,20,369,261" UsingAlphaChannel="False" 
-                             SelectedColor="{Binding Path=Color, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>-->
-
-        <ListBox Margin="26,20" Grid.Row="3" 
-                 ItemsSource="{Binding Path=Colors}"                  
-                 dd:DragDrop.IsDragSource="True" dd:DragDrop.IsDropTarget="True">
-
-            <ListBox.ItemTemplate>
-                <DataTemplate>
-                    <StackPanel Margin="5" Orientation="Horizontal">
-                        <TextBlock FontSize="16" 
-                                   Text="{Binding Path=Name, UpdateSourceTrigger=PropertyChanged}" 
-                                  Margin="5" HorizontalAlignment="Center" />
-                        <wpfTool:ColorPicker Grid.Row="3" Name="ColorPicker" 
-                                             Height="30" DisplayColorAndName="True" 
-                             Margin="5" UsingAlphaChannel="False" 
-                             SelectedColor="{Binding Path=Color, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+    <UserControl.Resources>
+        <Storyboard x:Key="OpenMenu">
+            <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(FrameworkElement.Width)" Storyboard.TargetName="GridMenu">
+                <EasingDoubleKeyFrame KeyTime="0" Value="70"/>
+                <EasingDoubleKeyFrame KeyTime="0:0:0.5" Value="200"/>
+            </DoubleAnimationUsingKeyFrames>
+        </Storyboard>
+        <Storyboard x:Key="CloseMenu">
+            <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(FrameworkElement.Width)" Storyboard.TargetName="GridMenu">
+                <EasingDoubleKeyFrame KeyTime="0" Value="200"/>
+                <EasingDoubleKeyFrame KeyTime="0:0:0.5" Value="70"/>
+            </DoubleAnimationUsingKeyFrames>
+        </Storyboard>
+    </UserControl.Resources>
+    <UserControl.Triggers>
+        <EventTrigger RoutedEvent="ButtonBase.Click" SourceName="ButtonOpenMenu">
+            <BeginStoryboard Storyboard="{StaticResource OpenMenu}"/>
+        </EventTrigger>
+        <EventTrigger RoutedEvent="ButtonBase.Click" SourceName="ButtonCloseMenu">
+            <BeginStoryboard Storyboard="{StaticResource CloseMenu}"/>
+        </EventTrigger>
+    </UserControl.Triggers>
+    <Grid Background="#FFDEDEDE">
+        <Grid x:Name="GridMain" HorizontalAlignment="Right" VerticalAlignment="Bottom" 
+              Height="540" Width="1010"/>
+        <Grid Height="60" VerticalAlignment="Top" Background="#FF5C99D6">
+            <Grid.Effect>
+                <DropShadowEffect BlurRadius="1" ShadowDepth="1" Color="#FFACACAC"/>
+            </Grid.Effect>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                <TextBlock Text="Abel Dutra" VerticalAlignment="Center" FontSize="16"/>
+                <materialDesign:PopupBox PlacementMode="BottomAndAlignRightEdges"
+                                         StaysOpen="False" Margin="10">
+                    <StackPanel Width="150">
+                        <Button Content="New"
+                                 cal:Message.Attach="New()"/>
+                        <Button Content="Open"
+                                 cal:Message.Attach="Open()"/>
+                        <Button Content="Save"
+                                 cal:Message.Attach="Save()"/>
+                        <Separator/>
+                        <Button Content="SaveAs"
+                                 cal:Message.Attach="SaveAs()"/>
                     </StackPanel>
-                </DataTemplate>
-            </ListBox.ItemTemplate>
+                </materialDesign:PopupBox>
+            </StackPanel>
+            <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" 
+                       FontSize="22">Design com WPF</TextBlock>
+        </Grid>
+        <Grid x:Name="GridMenu" Width="70" HorizontalAlignment="Left" Background="#FF31577E">
+            <Grid.Effect>
+                <DropShadowEffect BlurRadius="2" ShadowDepth="1" Color="#FFAEAEAE"/>
+            </Grid.Effect>
+            <StackPanel>
+                <Grid Height="150" Background="#FFB4D4EE" RenderTransformOrigin="0.5,0.5">
+                    <Grid.RenderTransform>
+                        <TransformGroup>
+                            <ScaleTransform/>
+                            <SkewTransform/>
+                            <RotateTransform/>
+                            <TranslateTransform/>
+                        </TransformGroup>
+                    </Grid.RenderTransform>
+                    <Button x:Name="ButtonOpenMenu" Height="60" 
+                            Width="60" Margin="5" HorizontalAlignment="Right" VerticalAlignment="Top" 
+                            Style="{StaticResource MaterialDesignFloatingActionMiniAccentButton}" 
+                            Background="{x:Null}" BorderBrush="{x:Null}" 
+                            Foreground="#FF31577E" Click="ButtonOpenMenu_Click">
+                        <materialDesign:PackIcon Kind="Menu" Width="25" Height="25"/>
+                    </Button>
+                    <Button x:Name="ButtonCloseMenu" Visibility="Collapsed" 
+                            Height="60" Width="60" Margin="5" HorizontalAlignment="Right" 
+                            VerticalAlignment="Top" 
+                           
+                            Background="{x:Null}" BorderBrush="{x:Null}" 
+                            Foreground="#FF31577E" Click="ButtonCloseMenu_Click">
+                        <materialDesign:PackIcon Kind="ArrowLeft" Width="25" Height="25"/>
+                    </Button>
 
-        </ListBox>
-
+                    <Image Height="80" VerticalAlignment="Bottom"/>
+                </Grid>
+                <ListView x:Name="ListViewMenu" Foreground="#FF5C99D6" 
+                          ScrollViewer.HorizontalScrollBarVisibility="Disabled" IsEnabled="{Binding Path=IsWorkingFile}">
+                    <ListViewItem x:Name="ItemHome" Height="60">
+                        <StackPanel Orientation="Horizontal">
+                            <materialDesign:PackIcon Kind="ViewDashboard" 
+                                                     Height="25" Width="25" Margin="10"/>
+                            <TextBlock Text="Home" VerticalAlignment="Center" Margin="20 10"/>
+                        </StackPanel>
+                    </ListViewItem>
+                    <ListViewItem x:Name="ItemCreate" Height="60">
+                        <StackPanel Orientation="Horizontal">
+                            <materialDesign:PackIcon Kind="Pencil" Height="25" Width="25" Margin="10"/>
+                            <TextBlock Text="Create" VerticalAlignment="Center" Margin="20 10"/>
+                        </StackPanel>
+                    </ListViewItem>
+                    <ListViewItem Height="60">
+                        <StackPanel Orientation="Horizontal">
+                            <materialDesign:PackIcon Kind="Ticket" Height="25" Width="25" Margin="10"/>
+                            <TextBlock Text="Tickets" VerticalAlignment="Center"  Margin="20 10"/>
+                        </StackPanel>
+                    </ListViewItem>
+                    <ListViewItem Height="60">
+                        <StackPanel Orientation="Horizontal">
+                            <materialDesign:PackIcon Kind="Message" Height="25" Width="25" Margin="10"/>
+                            <TextBlock Text="Messages" VerticalAlignment="Center"  Margin="20 10"/>
+                        </StackPanel>
+                    </ListViewItem>
+                </ListView>
+            </StackPanel>
+        </Grid>
     </Grid>
 </UserControl>
