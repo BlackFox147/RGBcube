@@ -2,6 +2,8 @@
 using RGBcube.Models;
 using RGBcube.Service;
 using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Windows.Media;
 
 namespace RGBcube.ViewModels
@@ -11,6 +13,19 @@ namespace RGBcube.ViewModels
         private string fileNameTextBox;
         private WorkingFile workingFile;        
         private string fileName;
+
+        private ObservableCollection<ColorGrid> colors = new ObservableCollection<ColorGrid>();
+        public ObservableCollection<ColorGrid> Colors
+        {
+            get { return colors; }
+            set
+            {
+                if (colors == value)
+                    return;
+                colors = value;                
+                NotifyOfPropertyChange(() => Colors);
+            }
+        }
 
         public string FileNameTextBox
         {
@@ -24,20 +39,20 @@ namespace RGBcube.ViewModels
             }
         }
 
-        private Color? color;
-        public Color? Color
-        {
-            get { return color; }
-            set
-            {
-                if (color == value)
-                    return;
-                color = value;
-                FileNameTextBox = color.Value.ToString();
-                NotifyOfPropertyChange(() => Color);
-                NotifyOfPropertyChange(() => FileNameTextBox);
-            }
-        }
+        //private Color? color;
+        //public Color? Color
+        //{
+        //    get { return color; }
+        //    set
+        //    {
+        //        if (color == value)
+        //            return;
+        //        color = value;
+        //        FileNameTextBox = color.Value.ToString();
+        //        NotifyOfPropertyChange(() => Color);
+        //        NotifyOfPropertyChange(() => FileNameTextBox);
+        //    }
+        //}
 
         public string FileName
         {
@@ -51,22 +66,22 @@ namespace RGBcube.ViewModels
             }
         }
 
-        public void Open()
-        {
-            workingFile = FileManager.Open();
-            if (workingFile != null)
-            {
-                var color = ParsStringToColor(workingFile.Content);
+        //public void Open()
+        //{
+        //    workingFile = FileManager.Open();
+        //    if (workingFile != null)
+        //    {
+        //        var color = ParsStringToColor(workingFile.Content);
 
-                Color = color;
-                FileName = workingFile.FileName;
-            }            
-        }
+        //        Color = color;
+        //        FileName = workingFile.FileName;
+        //    }            
+        //}
 
         public void New()
         {
             workingFile = new WorkingFile();
-            FileNameTextBox = string.Empty;
+            //FileNameTextBox = string.Empty;
             FileName = string.Empty;
 
             var temp = new Color
@@ -77,32 +92,50 @@ namespace RGBcube.ViewModels
                 A = 255
             };
 
-            Color = temp;
-        }
-
-        public void Save()
-        {
-            if (String.IsNullOrEmpty(workingFile.FileName))
+            var colorGrid = new ColorGrid
             {
-                SaveAs();
-                return;
-            }
+                Color = temp
+            };
+            Colors.Add(colorGrid);
 
-            if (!FileNameTextBox.Equals(workingFile.Content))
+            var temp2 = new Color
             {
-                workingFile.Content = ParsColorToString(Color);
-                FileManager.Save(workingFile);
-            }                  
-           
+                R = 50,
+                G = 50,
+                B = 50,
+                A = 255
+            };
+
+            var colorGrid2 = new ColorGrid
+            {
+                Color = temp
+            };
+            Colors.Add(colorGrid2);
         }
 
-        public void SaveAs()
-        {
+        //public void Save()
+        //{
+        //    if (String.IsNullOrEmpty(workingFile.FileName))
+        //    {
+        //        SaveAs();
+        //        return;
+        //    }
 
-            workingFile.Content = ParsColorToString(Color);
-            workingFile = FileManager.SaveAs(workingFile);
-            FileName = workingFile.FileName;
-        }
+        //    if (!FileNameTextBox.Equals(workingFile.Content))
+        //    {
+        //        workingFile.Content = ParsColorToString(Color);
+        //        FileManager.Save(workingFile);
+        //    }                  
+
+        //}
+
+        //public void SaveAs()
+        //{
+
+        //    workingFile.Content = ParsColorToString(Color);
+        //    workingFile = FileManager.SaveAs(workingFile);
+        //    FileName = workingFile.FileName;
+        //}
 
         private string ParsColorToString (Color? color)
         {
