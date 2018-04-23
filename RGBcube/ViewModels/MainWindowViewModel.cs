@@ -11,7 +11,6 @@ namespace RGBcube.ViewModels
 {
     public class MainWindowViewModel : PropertyChangedBase
     {
-        private string fileNameTextBox;
         private WorkingFile workingFile;
         private string fileName;
         private ColorGrid selectedItem;
@@ -40,20 +39,8 @@ namespace RGBcube.ViewModels
                 NotifyOfPropertyChange(() => SelectedItem);
             }
         }
-
-        public string FileNameTextBox
-        {
-            get { return fileNameTextBox; }
-            set
-            {
-                if (fileNameTextBox == value)
-                    return;
-                fileNameTextBox = value;
-                NotifyOfPropertyChange(() => FileNameTextBox);
-            }
-        }
-
-        public bool IsWorkingFile => workingFile != null ? true : false;
+   
+        public bool IsWorkingFile => workingFile != null;
 
         public string FileName
         {
@@ -96,7 +83,7 @@ namespace RGBcube.ViewModels
                 };
                 Colors.Insert(copy, colorGrid);
             }
-           
+
         }
 
         public void Remove()
@@ -115,65 +102,83 @@ namespace RGBcube.ViewModels
             NotifyOfPropertyChange(() => IsWorkingFile);
         }
 
-        //public void Open()
-        //{
-        //    workingFile = FileManager.Open();
-        //    if (workingFile != null)
-        //    {
-        //        var color = ParsStringToColor(workingFile.Content);
+        public void Open()
+        {
+            workingFile = FileManager.Open();
+            if (workingFile != null)
+            {
+                Colors = Pars(workingFile.Content);                 
+                FileName = workingFile.FileName;
+                NotifyOfPropertyChange(() => IsWorkingFile);
+            }
+        }
 
-        //        Color = color;
-        //        FileName = workingFile.FileName;
-        //    }            
-        //}
+        public void Save()
+        {
+            if (String.IsNullOrEmpty(workingFile.FileName))
+            {
+                SaveAs();
+                return;
+            }
 
-        //public void Save()
-        //{
-        //    if (String.IsNullOrEmpty(workingFile.FileName))
-        //    {
-        //        SaveAs();
-        //        return;
-        //    }
+            workingFile.Content = ParsColorToString(Colors);
+            FileManager.Save(workingFile);
+            NotifyOfPropertyChange(() => IsWorkingFile);
 
-        //    if (!FileNameTextBox.Equals(workingFile.Content))
-        //    {
-        //        workingFile.Content = ParsColorToString(Color);
-        //        FileManager.Save(workingFile);
-        //    }                  
+        }
 
-        //}
+        public void SaveAs()
+        {
 
-        //public void SaveAs()
-        //{
+            workingFile.Content = ParsColorToString(Colors);
+            workingFile = FileManager.SaveAs(workingFile);
+            FileName = workingFile.FileName;
+            NotifyOfPropertyChange(() => IsWorkingFile);
+        }
 
-        //    workingFile.Content = ParsColorToString(Color);
-        //    workingFile = FileManager.SaveAs(workingFile);
-        //    FileName = workingFile.FileName;
-        //}
+        private string ParsColorToString(ObservableCollection<ColorGrid> colors)
+        {           
+            return colors.Aggregate(string.Empty, (s, c) => s + Pars(c)); 
+        }
 
-        private string ParsColorToString(Color? color)
+        private string Pars(ColorGrid color)
         {
             string tempString;
 
-            tempString = Convert.ToString(color.Value.R) + ' ';
-            tempString += Convert.ToString(color.Value.G) + ' ';
-            tempString += Convert.ToString(color.Value.B) + ' ';
+            tempString = Convert.ToString(color.Color.Value.R) + ' ';
+            tempString += Convert.ToString(color.Color.Value.G) + ' ';
+            tempString += Convert.ToString(color.Color.Value.B) + '/';
 
             return tempString;
         }
 
-        private Color ParsStringToColor(string fileContent)
+        private ColorGrid ParsStringToColor(string colorContent)
         {
             char[] splitchar = { ' ' };
-            var strArr = fileContent.Trim().Split(splitchar);
+            var strArr = colorContent.Trim().Split(splitchar);
 
-            return new Color
+            var color = new Color
             {
                 R = Convert.ToByte(strArr[0]),
                 G = Convert.ToByte(strArr[1]),
                 B = Convert.ToByte(strArr[2]),
                 A = 255
             };
+
+            return new ColorGrid
+            {
+                Color = color
+            };
+        }
+
+        private ObservableCollection<ColorGrid> Pars(string fileContent)
+        {
+            char[] splitchar = { '/' };
+            var colorArr = fileContent.Trim().Split(splitchar).ToList();
+
+            var colorList = colorArr.Where(i => !string.IsNullOrEmpty(i)).Select(ParsStringToColor);
+
+            return new ObservableCollection<ColorGrid>(colorList);
         }
     }
 }
