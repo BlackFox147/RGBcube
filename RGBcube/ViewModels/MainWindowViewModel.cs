@@ -11,45 +11,45 @@ namespace RGBcube.ViewModels
 {
     public class MainWindowViewModel : PropertyChangedBase
     {
-        private WorkingFile workingFile;
-        private string fileName;
-        private ColorGrid selectedItem;
+        private WorkingFile _workingFile;
+        private string _fileName;
+        private ColorGrid _selectedItem;
 
-        private ObservableCollection<ColorGrid> colors = new ObservableCollection<ColorGrid>();
+        private ObservableCollection<ColorGrid> _colors = new ObservableCollection<ColorGrid>();
         public ObservableCollection<ColorGrid> Colors
         {
-            get { return colors; }
+            get => _colors;
             set
             {
-                if (colors == value)
+                if (_colors == value)
                     return;
-                colors = value;
+                _colors = value;
                 NotifyOfPropertyChange(() => Colors);
             }
         }
 
         public ColorGrid SelectedItem
         {
-            get { return selectedItem; }
+            get => _selectedItem;
             set
             {
-                if (selectedItem == value)
+                if (_selectedItem == value)
                     return;
-                selectedItem = value;
+                _selectedItem = value;
                 NotifyOfPropertyChange(() => SelectedItem);
             }
         }
    
-        public bool IsWorkingFile => workingFile != null;
+        public bool IsWorkingFile => _workingFile != null;
 
         public string FileName
         {
-            get { return fileName; }
+            get => _fileName;
             set
             {
-                if (fileName == value)
+                if (_fileName == value)
                     return;
-                fileName = value;
+                _fileName = value;
                 NotifyOfPropertyChange(() => FileName);
             }
         }
@@ -73,16 +73,15 @@ namespace RGBcube.ViewModels
 
         public void Copy()
         {
-            if (SelectedItem != null)
-            {
-                int copy = Colors.IndexOf(SelectedItem);
+            if (SelectedItem == null) return;
+            int copy = Colors.IndexOf(SelectedItem);
 
-                var colorGrid = new ColorGrid
-                {
-                    Color = SelectedItem.Color.Value
-                };
-                Colors.Insert(copy, colorGrid);
-            }
+            if (SelectedItem.Color == null) return;
+            var colorGrid = new ColorGrid
+            {
+                Color = SelectedItem.Color.Value
+            };
+            Colors.Insert(copy, colorGrid);
 
         }
 
@@ -96,7 +95,7 @@ namespace RGBcube.ViewModels
 
         public void New()
         {
-            workingFile = new WorkingFile();
+            _workingFile = new WorkingFile();
             FileName = "New file";
 
             NotifyOfPropertyChange(() => IsWorkingFile);
@@ -104,25 +103,25 @@ namespace RGBcube.ViewModels
 
         public void Open()
         {
-            workingFile = FileManager.Open();
-            if (workingFile != null)
-            {
-                Colors = Pars(workingFile.Content);                 
-                FileName = workingFile.FileName;
-                NotifyOfPropertyChange(() => IsWorkingFile);
-            }
+            _workingFile = FileManager.Open();
+
+            if (_workingFile == null) return;
+
+            Colors = Pars(_workingFile.Content);                 
+            FileName = _workingFile.FileName;
+            NotifyOfPropertyChange(() => IsWorkingFile);
         }
 
         public void Save()
         {
-            if (String.IsNullOrEmpty(workingFile.FileName))
+            if (string.IsNullOrEmpty(_workingFile.FileName))
             {
                 SaveAs();
                 return;
             }
 
-            workingFile.Content = ParsColorToString(Colors);
-            FileManager.Save(workingFile);
+            _workingFile.Content = ParsColorToString(Colors);
+            FileManager.Save(_workingFile);
             NotifyOfPropertyChange(() => IsWorkingFile);
 
         }
@@ -130,29 +129,30 @@ namespace RGBcube.ViewModels
         public void SaveAs()
         {
 
-            workingFile.Content = ParsColorToString(Colors);
-            workingFile = FileManager.SaveAs(workingFile);
-            FileName = workingFile.FileName;
+            _workingFile.Content = ParsColorToString(Colors);
+            _workingFile = FileManager.SaveAs(_workingFile);
+            FileName = _workingFile.FileName;
             NotifyOfPropertyChange(() => IsWorkingFile);
         }
 
-        private string ParsColorToString(ObservableCollection<ColorGrid> colors)
+        private static string ParsColorToString(IEnumerable<ColorGrid> colors)
         {           
             return colors.Aggregate(string.Empty, (s, c) => s + Pars(c)); 
         }
 
-        private string Pars(ColorGrid color)
+        private static string Pars(ColorGrid color)
         {
-            string tempString;
+            if (color.Color == null) return string.Empty;
 
-            tempString = Convert.ToString(color.Color.Value.R) + ' ';
+            string tempString = Convert.ToString(color.Color.Value.R) + ' ';
             tempString += Convert.ToString(color.Color.Value.G) + ' ';
             tempString += Convert.ToString(color.Color.Value.B) + '/';
 
             return tempString;
+
         }
 
-        private ColorGrid ParsStringToColor(string colorContent)
+        private static ColorGrid ParsStringToColor(string colorContent)
         {
             char[] splitchar = { ' ' };
             var strArr = colorContent.Trim().Split(splitchar);
@@ -171,7 +171,7 @@ namespace RGBcube.ViewModels
             };
         }
 
-        private ObservableCollection<ColorGrid> Pars(string fileContent)
+        private static ObservableCollection<ColorGrid> Pars(string fileContent)
         {
             char[] splitchar = { '/' };
             var colorArr = fileContent.Trim().Split(splitchar).ToList();
