@@ -1,6 +1,4 @@
-﻿
-
-namespace RGBcube.Models
+﻿namespace RGBcube.Models
 {
     public class WorkingFile
     {

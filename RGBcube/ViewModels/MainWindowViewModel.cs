@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Windows.Media;
 
 namespace RGBcube.ViewModels
 {
@@ -39,7 +38,7 @@ namespace RGBcube.ViewModels
                 NotifyOfPropertyChange(() => SelectedItem);
             }
         }
-   
+
         public bool IsWorkingFile => _workingFile != null;
 
         public string FileName
@@ -56,17 +55,11 @@ namespace RGBcube.ViewModels
 
         public void Create()
         {
-            var temp = new Color
-            {
-                R = 50,
-                G = 50,
-                B = 50,
-                A = 255
-            };
-
             var colorGrid = new ColorGrid
             {
-                Color = temp
+                R = 0,
+                G = 0,
+                B = 0
             };
             Colors.Add(colorGrid);
         }
@@ -76,10 +69,11 @@ namespace RGBcube.ViewModels
             if (SelectedItem == null) return;
             int copy = Colors.IndexOf(SelectedItem);
 
-            if (SelectedItem.Color == null) return;
             var colorGrid = new ColorGrid
             {
-                Color = SelectedItem.Color.Value
+                R = SelectedItem.R,
+                G = SelectedItem.G,
+                B = SelectedItem.B
             };
             Colors.Insert(copy, colorGrid);
 
@@ -95,6 +89,8 @@ namespace RGBcube.ViewModels
 
         public void New()
         {
+            Colors.Clear();
+
             _workingFile = new WorkingFile();
             FileName = "New file";
 
@@ -103,11 +99,13 @@ namespace RGBcube.ViewModels
 
         public void Open()
         {
+            Colors.Clear();
+
             _workingFile = FileManager.Open();
 
             if (_workingFile == null) return;
 
-            Colors = Pars(_workingFile.Content);                 
+            Colors = Pars(_workingFile.Content);
             FileName = _workingFile.FileName;
             NotifyOfPropertyChange(() => IsWorkingFile);
         }
@@ -136,17 +134,15 @@ namespace RGBcube.ViewModels
         }
 
         private static string ParsColorToString(IEnumerable<ColorGrid> colors)
-        {           
-            return colors.Aggregate(string.Empty, (s, c) => s + Pars(c)); 
+        {
+            return colors.Aggregate(string.Empty, (s, c) => s + Pars(c));
         }
 
         private static string Pars(ColorGrid color)
         {
-            if (color.Color == null) return string.Empty;
-
-            string tempString = Convert.ToString(color.Color.Value.R) + ' ';
-            tempString += Convert.ToString(color.Color.Value.G) + ' ';
-            tempString += Convert.ToString(color.Color.Value.B) + '/';
+            string tempString = Convert.ToString(color.R) + ' ';
+            tempString += Convert.ToString(color.G) + ' ';
+            tempString += Convert.ToString(color.B) + ' ' + '/' + ' ';
 
             return tempString;
 
@@ -157,17 +153,11 @@ namespace RGBcube.ViewModels
             char[] splitchar = { ' ' };
             var strArr = colorContent.Trim().Split(splitchar);
 
-            var color = new Color
-            {
-                R = Convert.ToByte(strArr[0]),
-                G = Convert.ToByte(strArr[1]),
-                B = Convert.ToByte(strArr[2]),
-                A = 255
-            };
-
             return new ColorGrid
             {
-                Color = color
+                R = Convert.ToInt32(strArr[0]),
+                G = Convert.ToInt32(strArr[1]),
+                B = Convert.ToInt32(strArr[2])
             };
         }
 

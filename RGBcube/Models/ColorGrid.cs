@@ -1,31 +1,46 @@
 ﻿using Caliburn.Micro;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Media;
 
 namespace RGBcube.Models
 {
     public class ColorGrid : PropertyChangedBase
     {
-        public string Name => Color?.ToString() ?? null;
+        private int _r;
+        private int _g;
+        private int _b;
 
-        private Color? color;
-        public Color? Color
+        public int R
         {
-            get { return color; }
+            get => _r;
             set
             {
-                if (color == value)
-                    return;
-                color = value;
-                
-                NotifyOfPropertyChange(() => Color);
-                NotifyOfPropertyChange(() => Name);
+                if (value < 0 || value >= 4095) return;
+                _r = value;
+                NotifyOfPropertyChange(() => R);
             }
         }
+
+        public int G
+        {
+            get => _g;
+            set
+            {
+                if (value < 0 || value >= 4095) return;
+                _g = value;
+                NotifyOfPropertyChange(() => G);
+            }
+        }
+
+        public int B
+        {
+            get => _b;
+            set
+            {
+                if (value < 0 || value >= 4095) return;
+                _b = value;
+                NotifyOfPropertyChange(() => B);
+            }
+        }
+
 
     }
 }

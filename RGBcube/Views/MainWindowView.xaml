@@ -107,14 +107,14 @@
                                   cal:Message.Attach="[Event Selected] = [Action Copy]">
                         <StackPanel Orientation="Horizontal">
                             <materialDesign:PackIcon Kind="Pencil" Height="25" Width="25" Margin="10"/>
-                            <TextBlock Text="Create" VerticalAlignment="Center" Margin="20 10"/>
+                            <TextBlock Text="Copy" VerticalAlignment="Center" Margin="20 10"/>
                         </StackPanel>
                     </ListViewItem>
                     <ListViewItem Height="60"
                                   cal:Message.Attach="[Event Selected] = [Action Remove]">
                         <StackPanel Orientation="Horizontal">
                             <materialDesign:PackIcon Kind="Minus" Height="25" Width="25" Margin="10"/>
-                            <TextBlock Text="Tickets" VerticalAlignment="Center"  Margin="20 10"/>
+                            <TextBlock Text="Remove" VerticalAlignment="Center"  Margin="20 10"/>
                         </StackPanel>
                     </ListViewItem>
 
@@ -126,8 +126,15 @@
                     </ListViewItem>
 
                 </ListView>
-            </StackPanel>   
-        </Grid>       
+            </StackPanel>
+        </Grid>
+
+        <StackPanel Orientation="Horizontal">
+            <TextBox FontSize="16" 
+                       Text="" 
+                       Margin="5" HorizontalAlignment="Center" />
+
+        </StackPanel>
 
         <ListBox VerticalAlignment="Top" HorizontalAlignment="Left" Margin="200,100,10,10" 
                  ItemsSource="{Binding Path=Colors}"                  
@@ -140,15 +147,15 @@
             </ListBox.ItemsPanel>
             <ListBox.ItemTemplate>
                 <DataTemplate>
-                    <StackPanel Orientation="Horizontal">
-                        <TextBlock FontSize="16" 
-                                   Text="{Binding Path=Name, UpdateSourceTrigger=PropertyChanged}" 
-                                  Margin="5" HorizontalAlignment="Center" />
-                        <wpfTool:ColorPicker Name="ColorPicker" 
-                                             Height="30" DisplayColorAndName="False" 
-                                             Width="150"
-                             Margin="5" UsingAlphaChannel="False" 
-                             SelectedColor="{Binding Path=Color, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                    <StackPanel Orientation="Horizontal" Background="White">
+                        <Label>R:</Label>
+                        <wpfTool:IntegerUpDown Minimum="0" Maximum="4095" Text="{Binding Path=R, UpdateSourceTrigger=PropertyChanged}"></wpfTool:IntegerUpDown>
+
+                        <Label>G:</Label>
+                        <wpfTool:IntegerUpDown Minimum="0" Maximum="4095" Text="{Binding Path=G, UpdateSourceTrigger=PropertyChanged}"></wpfTool:IntegerUpDown>
+
+                        <Label>B:</Label>
+                        <wpfTool:IntegerUpDown Minimum="0" Maximum="4095" Text="{Binding Path=B, UpdateSourceTrigger=PropertyChanged}"></wpfTool:IntegerUpDown>
                     </StackPanel>
                 </DataTemplate>
             </ListBox.ItemTemplate>
