@@ -11,32 +11,20 @@
              xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
         mc:Ignorable="d" Height="600" Width="1080" Foreground="White" >
 
-    <UserControl.Resources>
-        <Storyboard x:Key="OpenMenu">
-            <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(FrameworkElement.Width)" Storyboard.TargetName="GridMenu">
-                <EasingDoubleKeyFrame KeyTime="0" Value="70"/>
-                <EasingDoubleKeyFrame KeyTime="0:0:0.5" Value="200"/>
-            </DoubleAnimationUsingKeyFrames>
-        </Storyboard>
-        <Storyboard x:Key="CloseMenu">
-            <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(FrameworkElement.Width)" Storyboard.TargetName="GridMenu">
-                <EasingDoubleKeyFrame KeyTime="0" Value="200"/>
-                <EasingDoubleKeyFrame KeyTime="0:0:0.5" Value="70"/>
-            </DoubleAnimationUsingKeyFrames>
-        </Storyboard>
-    </UserControl.Resources>
-    <UserControl.Triggers>
-        <EventTrigger RoutedEvent="ButtonBase.Click" SourceName="ButtonOpenMenu">
-            <BeginStoryboard Storyboard="{StaticResource OpenMenu}"/>
-        </EventTrigger>
-        <EventTrigger RoutedEvent="ButtonBase.Click" SourceName="ButtonCloseMenu">
-            <BeginStoryboard Storyboard="{StaticResource CloseMenu}"/>
-        </EventTrigger>
-    </UserControl.Triggers>
+   
     <Grid Background="#FFDEDEDE">
-        <Grid x:Name="GridMain" HorizontalAlignment="Right" VerticalAlignment="Bottom" 
-              Height="540" Width="1010"/>
-        <Grid Height="60" VerticalAlignment="Top" Background="#FF5C99D6">
+        
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"></ColumnDefinition>
+            <ColumnDefinition Width="*"></ColumnDefinition>
+        </Grid.ColumnDefinitions>
+        
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition Height="*"></RowDefinition>
+        </Grid.RowDefinitions>
+        
+        <Grid Grid.Column ="1" Height="60" VerticalAlignment="Top" Background="#FF5C99D6">
             <Grid.Effect>
                 <DropShadowEffect BlurRadius="1" ShadowDepth="1" Color="#FFACACAC"/>
             </Grid.Effect>
@@ -57,42 +45,26 @@
                     </StackPanel>
                 </materialDesign:PopupBox>
             </StackPanel>
-            <TextBlock Margin="80,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center" 
+            <TextBlock Margin="10" HorizontalAlignment="Left" VerticalAlignment="Center" 
                        FontSize="22" Text="{Binding FileName}"></TextBlock>
         </Grid>
-        <Grid x:Name="GridMenu" Width="70" HorizontalAlignment="Left" Background="#FF31577E">
+        <Grid x:Name="GridMenu" Grid.Column="0" Grid.Row="0" Grid.RowSpan="2" Width="70" HorizontalAlignment="Left" Background="#FF31577E">
             <Grid.Effect>
                 <DropShadowEffect BlurRadius="2" ShadowDepth="1" Color="#FFAEAEAE"/>
             </Grid.Effect>
             <StackPanel>
-                <Grid Height="150" Background="#FFB4D4EE" RenderTransformOrigin="0.5,0.5">
-                    <Grid.RenderTransform>
-                        <TransformGroup>
-                            <ScaleTransform/>
-                            <SkewTransform/>
-                            <RotateTransform/>
-                            <TranslateTransform/>
-                        </TransformGroup>
-                    </Grid.RenderTransform>
-                    <Button x:Name="ButtonOpenMenu" Height="60" 
+                <Grid Height="150" Background="#FFB4D4EE">
+                    <Button x:Name="ButtonOpenMenu" Height="60" IsEnabled="{Binding Path=IsBack}"
                             Width="60" Margin="5" HorizontalAlignment="Right" VerticalAlignment="Top" 
-                            Style="{StaticResource MaterialDesignFloatingActionMiniAccentButton}" 
                             Background="{x:Null}" BorderBrush="{x:Null}" 
-                            Foreground="#FF31577E" Click="ButtonOpenMenu_Click">
-                        <materialDesign:PackIcon Kind="Menu" Width="25" Height="25"/>
-                    </Button>
-                    <Button x:Name="ButtonCloseMenu" Visibility="Collapsed" 
-                            Height="60" Width="60" Margin="5" HorizontalAlignment="Right" 
-                            VerticalAlignment="Top" 
-                           
-                            Background="{x:Null}" BorderBrush="{x:Null}" 
-                            Foreground="#FF31577E" Click="ButtonCloseMenu_Click">
+                            Foreground="#FF31577E"
+                            cal:Message.Attach="[Event Click] = [Action Back]">
                         <materialDesign:PackIcon Kind="ArrowLeft" Width="25" Height="25"/>
                     </Button>
 
                     <Image Height="80" VerticalAlignment="Bottom"/>
                 </Grid>
-                <ListView x:Name="ListViewMenu" Foreground="#FF5C99D6" 
+                <ListView x:Name="ListViewMenu" Background="#FF5C99D6" 
                           ScrollViewer.HorizontalScrollBarVisibility="Disabled" 
                           IsEnabled="{Binding Path=IsWorkingFile}">
                     <ListViewItem Height="60" 
@@ -110,6 +82,15 @@
                             <TextBlock Text="Copy" VerticalAlignment="Center" Margin="20 10"/>
                         </StackPanel>
                     </ListViewItem>
+
+                    <ListViewItem Height="60"
+                                  cal:Message.Attach="[Event Selected] = [Action ConditionDetail]">
+                        <StackPanel Orientation="Horizontal">
+                            <materialDesign:PackIcon Kind="Settings" Height="25" Width="25" Margin="10"/>
+                            <TextBlock Text="Remove" VerticalAlignment="Center"  Margin="20 10"/>
+                        </StackPanel>
+                    </ListViewItem>
+
                     <ListViewItem Height="60"
                                   cal:Message.Attach="[Event Selected] = [Action Remove]">
                         <StackPanel Orientation="Horizontal">
@@ -129,14 +110,8 @@
             </StackPanel>
         </Grid>
 
-        <StackPanel Orientation="Horizontal">
-            <TextBox FontSize="16" 
-                       Text="" 
-                       Margin="5" HorizontalAlignment="Center" />
-
-        </StackPanel>
-
-        <ListBox VerticalAlignment="Top" HorizontalAlignment="Left" Margin="200,100,10,10" 
+        <ContentControl Grid.Column="1" Grid.Row="1" x:Name="WorkViewModel" Margin="10" />
+        <!--<ListBox VerticalAlignment="Top" HorizontalAlignment="Left" Margin="200,100,10,10" 
                  ItemsSource="{Binding Path=Colors}"                  
                  dd:DragDrop.IsDragSource="True" dd:DragDrop.IsDropTarget="True"
                  SelectedItem="{Binding Path=SelectedItem, UpdateSourceTrigger=PropertyChanged}">
@@ -160,6 +135,6 @@
                 </DataTemplate>
             </ListBox.ItemTemplate>
 
-        </ListBox>
+        </ListBox>-->
     </Grid>
 </UserControl>

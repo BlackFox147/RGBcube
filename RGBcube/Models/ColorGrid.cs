@@ -8,6 +8,13 @@ namespace RGBcube.Models
         private int _g;
         private int _b;
 
+        public ColorGrid()
+        {
+            _r = 0;
+            _g = 0;
+            _b = 0;
+        }
+
         public int R
         {
             get => _r;

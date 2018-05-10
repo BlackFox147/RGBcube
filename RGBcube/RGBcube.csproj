@@ -108,11 +108,20 @@
     </Compile>
     <Compile Include="AppBootstrapper.cs" />
     <Compile Include="Models\ColorGrid.cs" />
+    <Compile Include="Models\Condition.cs" />
     <Compile Include="Models\WorkingFile.cs" />
     <Compile Include="Service\FileManager.cs" />
+    <Compile Include="ViewModels\LayerViewModel.cs" />
     <Compile Include="ViewModels\MainWindowViewModel.cs" />
+    <Compile Include="ViewModels\СonditionsViewModel.cs" />
+    <Compile Include="Views\LayerView.xaml.cs">
+      <DependentUpon>LayerView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\MainWindowView.xaml.cs">
       <DependentUpon>MainWindowView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\СonditionsView.xaml.cs">
+      <DependentUpon>СonditionsView.xaml</DependentUpon>
     </Compile>
   </ItemGroup>
   <ItemGroup>
@@ -144,7 +153,15 @@
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
+    <Page Include="Views\LayerView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Views\MainWindowView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\СonditionsView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

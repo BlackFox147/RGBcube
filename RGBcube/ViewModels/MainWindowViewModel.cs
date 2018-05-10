@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using Bootstrap;
 
 namespace RGBcube.ViewModels
 {
@@ -12,34 +13,63 @@ namespace RGBcube.ViewModels
     {
         private WorkingFile _workingFile;
         private string _fileName;
-        private ColorGrid _selectedItem;
-
-        private ObservableCollection<ColorGrid> _colors = new ObservableCollection<ColorGrid>();
-        public ObservableCollection<ColorGrid> Colors
+        private СonditionsViewModel _conditionsViewModel;
+        private LayerViewModel _layerViewModel;
+        private object _workViewModel;
+       
+        public MainWindowViewModel()
         {
-            get => _colors;
+            _conditionsViewModel = new СonditionsViewModel();
+            _workViewModel = _conditionsViewModel;
+            
+        }
+
+        public object WorkViewModel
+        {
+            get => _workViewModel;
             set
             {
-                if (_colors == value)
-                    return;
-                _colors = value;
-                NotifyOfPropertyChange(() => Colors);
+                _workViewModel = value;
+                NotifyOfPropertyChange(() => WorkViewModel);
+                NotifyOfPropertyChange(() => IsBack);
+                NotifyOfPropertyChange(() => IsWorkingFile);
             }
         }
 
-        public ColorGrid SelectedItem
+        public СonditionsViewModel СonditionsViewModel
         {
-            get => _selectedItem;
+            get => _conditionsViewModel;
             set
             {
-                if (_selectedItem == value)
-                    return;
-                _selectedItem = value;
-                NotifyOfPropertyChange(() => SelectedItem);
+                _conditionsViewModel = value;
+                NotifyOfPropertyChange(() => СonditionsViewModel);
             }
         }
 
-        public bool IsWorkingFile => _workingFile != null;
+        public LayerViewModel LayerViewModel
+        {
+            get => _layerViewModel;
+            set
+            {
+                _layerViewModel = value;
+                NotifyOfPropertyChange(() => LayerViewModel);
+            }
+        }
+
+        public ObservableCollection<Condition> Conditions
+        {
+            get => СonditionsViewModel.Conditions;
+            set
+            {
+                if (СonditionsViewModel.Conditions == value)
+                    return;
+                СonditionsViewModel.Conditions = value;
+                NotifyOfPropertyChange(() => Conditions);
+            }
+        }
+
+        public bool IsWorkingFile => _workingFile != null && WorkViewModel is СonditionsViewModel;
+        public bool IsBack => WorkViewModel is LayerViewModel;
 
         public string FileName
         {
@@ -55,41 +85,43 @@ namespace RGBcube.ViewModels
 
         public void Create()
         {
-            var colorGrid = new ColorGrid
-            {
-                R = 0,
-                G = 0,
-                B = 0
-            };
-            Colors.Add(colorGrid);
+            Conditions.Add(new Condition());
         }
 
         public void Copy()
         {
-            if (SelectedItem == null) return;
-            int copy = Colors.IndexOf(SelectedItem);
-
-            var colorGrid = new ColorGrid
-            {
-                R = SelectedItem.R,
-                G = SelectedItem.G,
-                B = SelectedItem.B
-            };
-            Colors.Insert(copy, colorGrid);
+            if (СonditionsViewModel.SelectedItem == null) return;
+            int copy = СonditionsViewModel.Conditions.IndexOf(СonditionsViewModel.SelectedItem);
+            
+            СonditionsViewModel.Conditions.Insert(copy, new Condition(СonditionsViewModel.SelectedItem));
 
         }
 
         public void Remove()
         {
-            if (SelectedItem != null)
+            if (СonditionsViewModel.SelectedItem != null)
             {
-                Colors.Remove(SelectedItem);
+                СonditionsViewModel.Conditions.Remove(СonditionsViewModel.SelectedItem);
+            }
+        }
+
+        public void Back()
+        {
+            WorkViewModel = СonditionsViewModel;
+        }
+
+        public void ConditionDetail()
+        {
+            if (СonditionsViewModel.SelectedItem != null)
+            {
+                LayerViewModel = new LayerViewModel(СonditionsViewModel.SelectedItem);
+                WorkViewModel = LayerViewModel;
             }
         }
 
         public void New()
         {
-            Colors.Clear();
+            Conditions.Clear();
 
             _workingFile = new WorkingFile();
             FileName = "New file";
@@ -99,13 +131,13 @@ namespace RGBcube.ViewModels
 
         public void Open()
         {
-            Colors.Clear();
+            Conditions.Clear();
 
             _workingFile = FileManager.Open();
 
             if (_workingFile == null) return;
 
-            Colors = Pars(_workingFile.Content);
+            Conditions = Pars(_workingFile.Content);
             FileName = _workingFile.FileName;
             NotifyOfPropertyChange(() => IsWorkingFile);
         }
@@ -118,7 +150,7 @@ namespace RGBcube.ViewModels
                 return;
             }
 
-            _workingFile.Content = ParsColorToString(Colors);
+            _workingFile.Content = Conditions.Aggregate(string.Empty, (s, c) => s + ParsColorToString(c.LayerColors));
             FileManager.Save(_workingFile);
             NotifyOfPropertyChange(() => IsWorkingFile);
 
@@ -127,7 +159,7 @@ namespace RGBcube.ViewModels
         public void SaveAs()
         {
 
-            _workingFile.Content = ParsColorToString(Colors);
+            _workingFile.Content = Conditions.Aggregate(string.Empty, (s, c) => s + ParsColorToString(c.LayerColors));
             _workingFile = FileManager.SaveAs(_workingFile);
             FileName = _workingFile.FileName;
             NotifyOfPropertyChange(() => IsWorkingFile);
@@ -135,7 +167,7 @@ namespace RGBcube.ViewModels
 
         private static string ParsColorToString(IEnumerable<ColorGrid> colors)
         {
-            return colors.Aggregate(string.Empty, (s, c) => s + Pars(c));
+            return colors.Aggregate(string.Empty, (s, c) => s + Pars(c))+ " * ";
         }
 
         private static string Pars(ColorGrid color)
@@ -161,14 +193,27 @@ namespace RGBcube.ViewModels
             };
         }
 
-        private static ObservableCollection<ColorGrid> Pars(string fileContent)
+        private static ObservableCollection<Condition> Pars(string fileContent)
         {
-            char[] splitchar = { '/' };
-            var colorArr = fileContent.Trim().Split(splitchar).ToList();
+            char[] split = { '*' };
+            var conditionArr = fileContent.Trim().Split(split).ToList();
 
-            var colorList = colorArr.Where(i => !string.IsNullOrEmpty(i)).Select(ParsStringToColor);
+            var result = new ObservableCollection<Condition>();
+            foreach (string conditionString in conditionArr.Where(i => !string.IsNullOrEmpty(i.Trim())))
+            {
+                char[] splitchar = { '/' };
+                var colorArr = conditionString.Trim().Split(splitchar).ToList();
 
-            return new ObservableCollection<ColorGrid>(colorList);
+                var colorList = colorArr.Where(i => !string.IsNullOrEmpty(i.Trim())).Select(ParsStringToColor);
+                var conditiion = new Condition
+                {
+                    LayerColors = new ObservableCollection<ColorGrid>(colorList)
+                };
+
+                result.Add(conditiion);
+            }
+            return result;
+
         }
     }
 }

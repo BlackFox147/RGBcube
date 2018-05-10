@@ -54,7 +54,7 @@ void loop()
 				int temp = myFile.read();
 				position = myFile.position();
 
-				if (temp != '/') {
+				if (temp != '/' && temp!= '*') {
 					int sum = 0;
 					while (temp != ' ') {
 						int number = temp - 48;
